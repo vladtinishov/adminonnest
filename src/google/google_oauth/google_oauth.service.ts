@@ -14,22 +14,17 @@ export type OauthData = {
   api_key?: string;
 }
 
-export type Ids = {
-  google_app_id: number;
-  amo_account_id: number;
-}
+export type GoogleAppId = number;
+
 
 @Injectable()
 export class GoogleOAuthService {
   constructor(
     @InjectRepository(GoogleApps)
     private readonly usersRepository: Repository<GoogleApps>,
-  ) {
-    this.usersRepository.findOne()
-  }
+  ) {}
 
-  async getOAuthClient(googleAppsId: number) {
-    const credentials = await this.usersRepository.findOne(googleAppsId);
+  async getOAuthClient(credentials) {
     const { client_id, client_secret, redirect_uri } = credentials;
     return new google.auth.OAuth2(client_id, client_secret, redirect_uri);
   }
@@ -39,8 +34,11 @@ export class GoogleOAuthService {
   //   return this.usersRepository.save(credentialsData);
   // }
 
-  async getAuthUrl(scopes: string[], googleAppsId: number) {
-    const authUrl = (await this.getOAuthClient(googleAppsId)).generateAuthUrl({
+  async getAuthUrl(googleAppsId: GoogleAppId) {
+    const credentials = await this.usersRepository.findOne(googleAppsId);
+    const scopes = credentials.scopes.split(',');
+    console.log(scopes);
+    const authUrl = (await this.getOAuthClient(credentials)).generateAuthUrl({
       access_type: 'offline',
       scope: scopesData.getScopes(scopes),
     });

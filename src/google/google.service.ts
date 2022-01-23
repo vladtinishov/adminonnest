@@ -38,8 +38,8 @@ export class GoogleService {
   getAccessToken(code: string) {
     return new Promise((resolve) => {
       this.oAuth2Client.getToken(code, async (err: object, tokens: Tokens) => {
-        await this.oAuth2Client.setCredentials(tokens);
-        console.log(tokens);
+        const b = await this.oAuth2Client.setCredentials(tokens);
+        console.log(b);
         const users = await this.getUserInfo(tokens.access_token);
         resolve({...tokens, ...users});
       });

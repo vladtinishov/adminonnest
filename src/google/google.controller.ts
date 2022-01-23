@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
 import { GoogleService } from './google.service';
 import { CredentialsData, GoogleAppsService } from './google_apps/google_apps.service';
-import { GoogleOAuthService } from './google_oauth/google_oauth.service';
+import { GoogleAppId, GoogleOAuthService } from './google_oauth/google_oauth.service';
 
 @Controller('google')
 export class GoogleController {
@@ -35,15 +35,15 @@ export class GoogleController {
   }
 
   @Get('/get-token')
-  async getJwt(@Req() req) {
-    const credentialsData: CredentialsData = req.body;
-    return this.googleAppsService.saveCredentials(credentialsData);
+  async getJwt(@Query() query: CredentialsData) {
+    return this.googleAppsService.saveCredentials(query);
   }
 
   @Get('/get-url')
-  async getUrl() {
-    // TODO: переделать это и сделать, чтобы было через базу данных
-    return await this.googleOAuthService.getAuthUrl(['email', 'sheets'], 3);
+  async getUrl(@Query() query) {
+    const id: GoogleAppId = query.id;
+    console.log(query);
+    return await this.googleOAuthService.getAuthUrl(id);
   }
 
 }
